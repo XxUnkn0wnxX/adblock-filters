@@ -1,0 +1,140 @@
+name: Sync upstream filters
+
+on:
+  schedule:
+    # Run every six hours at minute 17 UTC.
+    - cron: '17 */6 * * *'
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/sync-upstream.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-upstream-main
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out main
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: main
+
+      - name: Download and publish mapped filters
+        shell: bash
+        env:
+          UPSTREAM_FILTERS: |
+            # One destination path and one raw HTTPS URL per row.
+            filters/youtube/upstream/sponsorblock.txt https://raw.githubusercontent.com/mchangrh/yt-neuter/main/filters/sponsorblock.txt
+            # This unpinned gist URL follows the latest revision.
+            filters/youtube/upstream/ublock-filter-youtube.txt https://gist.githubusercontent.com/tadwohlrapp/722bbe97cb20bb34da8df73675415cae/raw/ublock-filter-youtube.txt
+        run: |
+          set -euo pipefail
+
+          declare -a destinations=()
+          declare -a sources=()
+          declare -a changed_destinations=()
+          declare -a changed_indices=()
+
+          # Validate the complete mapping table before making any requests.
+          while IFS= read -r line || [ -n "$line" ]; do
+            if [[ "$line" =~ ^[[:space:]]*$ || "$line" =~ ^[[:space:]]*# ]]; then
+              continue
+            fi
+
+            if [[ ! "$line" =~ ^[[:space:]]*([^[:space:]]+)[[:space:]]+(https://[^[:space:]]+)[[:space:]]*$ ]]; then
+              printf 'Invalid UPSTREAM_FILTERS row: %s\n' "$line" >&2
+              exit 1
+            fi
+
+            destination=${BASH_REMATCH[1]}
+            source=${BASH_REMATCH[2]}
+            if [[ ! "$destination" =~ ^filters/[A-Za-z0-9][A-Za-z0-9._-]*/upstream/[A-Za-z0-9][A-Za-z0-9._-]*\.txt$ ]]; then
+              printf 'Unsafe destination: %s\n' "$destination" >&2
+              exit 1
+            fi
+
+            for existing in "${destinations[@]}"; do
+              if [ "$existing" = "$destination" ]; then
+                printf 'Duplicate destination: %s\n' "$destination" >&2
+                exit 1
+              fi
+            done
+
+            destinations+=("$destination")
+            sources+=("$source")
+          done <<< "$UPSTREAM_FILTERS"
+
+          if [ "${#destinations[@]}" -eq 0 ]; then
+            printf 'UPSTREAM_FILTERS is empty.\n' >&2
+            exit 1
+          fi
+
+          temp_dir=$(mktemp -d "${RUNNER_TEMP:-/tmp}/sync-upstream.XXXXXX")
+          trap 'rm -rf "$temp_dir"' EXIT
+
+          # Download every source first so a failure preserves checkout files.
+          for index in "${!sources[@]}"; do
+            destination=${destinations[$index]}
+            source=${sources[$index]}
+            printf 'Downloading %s\n' "$source"
+            content_type=$(curl \
+              --fail --location --silent --show-error \
+              --retry 3 --connect-timeout 15 --max-time 120 \
+              --proto '=https' --proto-redir '=https' \
+              --output "$temp_dir/$index" --write-out '%{content_type}' \
+              "$source")
+
+            if [ ! -s "$temp_dir/$index" ]; then
+              printf 'Downloaded empty body for %s\n' "$source" >&2
+              exit 1
+            fi
+            content_type=$(printf '%s' "$content_type" | tr '[:upper:]' '[:lower:]')
+            case "$content_type" in
+              text/html*|application/xhtml+xml*)
+                printf 'Rejected HTML response for %s (%s)\n' "$source" "$content_type" >&2
+                exit 1
+                ;;
+            esac
+          done
+
+          # Compare exact bytes so unchanged mappings need no Git operations.
+          for index in "${!destinations[@]}"; do
+            destination=${destinations[$index]}
+            if [ ! -f "$destination" ] || ! cmp -s "$temp_dir/$index" "$destination"; then
+              changed_destinations+=("$destination")
+              changed_indices+=("$index")
+            fi
+          done
+
+          if [ "${#changed_destinations[@]}" -eq 0 ]; then
+            printf 'Mapped filters are already current.\n'
+            exit 0
+          fi
+
+          # Copy and stage only the changed mapped paths.
+          for index in "${changed_indices[@]}"; do
+            destination=${destinations[$index]}
+            mkdir -p "$(dirname "$destination")"
+            cp "$temp_dir/$index" "$destination"
+          done
+
+          git add -- "${changed_destinations[@]}"
+          if git diff --cached --quiet; then
+            printf 'Mapped filters are already current.\n'
+            exit 0
+          fi
+
+          git -c user.name='github-actions[bot]' \
+            -c user.email='41898282+github-actions[bot]@users.noreply.github.com' \
+            commit -m 'Update upstream filters'
+          git push origin HEAD:main

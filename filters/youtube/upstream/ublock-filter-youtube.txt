@@ -1,0 +1,394 @@
+! ============================
+! YouTube Top Nav Bar
+! ============================
+
+! always show normal YouTube logo, never that distracting doodleyoodle
+www.youtube.com##ytd-topbar-logo-renderer > a > ytd-yoodle-renderer
+www.youtube.com##ytd-topbar-logo-renderer > a > div:remove-attr(hidden)
+
+! hide "Search with your voice" button (YouTube users have no voice)
+www.youtube.com###masthead #center #voice-search-button
+
+! hide "+Create" button
+www.youtube.com###masthead #end #buttons > ytd-button-renderer
+
+! rather experimental: fix weird height issue with top navigation bar after page-navigation + remove annoying frosted glass background effect
+www.youtube.com#$##frosted-glass.with-chipbar.ytd-app {background: var(--yt-spec-base-background)!important;height: var(--ytd-toolbar-height)!important;}
+www.youtube.com#$#ytd-feed-filter-chip-bar-renderer[frosted-glass-mode=with-chipbar] #chips-wrapper.ytd-feed-filter-chip-bar-renderer, ytd-masthead[frosted-glass-mode=without-chipbar] #background.ytd-masthead {background: var(--yt-spec-base-background)!important;}
+
+
+
+! ============================
+! YouTube Left Main Menu
+! ============================
+
+! hide "Shorts" menu item
+www.youtube.com##ytd-guide-renderer ytd-guide-entry-renderer:has(a[title="Shorts"]), ytd-mini-guide-entry-renderer[aria-label="Shorts"]
+
+! hide "Explore" menu section
+www.youtube.com##ytd-guide-section-renderer:has(#guide-section-title:has-text(/Explore/))
+
+! hide "More from YouTube" menu section
+www.youtube.com##ytd-guide-section-renderer:has(#guide-section-title:has-text(/More from YouTube/))
+
+
+
+! ============================
+! YouTube Home Page
+! ============================
+
+! hide disruptive sections like "Shorts" or "Top News" on Home Page
+www.youtube.com##[page-subtype="home"] ytd-rich-section-renderer:has(#dismissible)
+
+! hide "How is this recommendation?" tooltip below videos on Home Page
+www.youtube.com##[page-subtype="home"] ytd-rich-item-renderer #attached-survey
+
+! hide videos I already watched in full (>=70%) on Home Page
+www.youtube.com##[page-subtype="home"] ytd-rich-item-renderer:has(:is(#progress, yt-lockup-view-model .ytThumbnailOverlayProgressBarHostWatchedProgressBarSegment):matches-attr(style="/width: ([789][0-9]|100)%/"))
+
+! hide old videos (1 year and older) on Home Page
+www.youtube.com##[page-subtype="home"] ytd-rich-item-renderer:has(:is(.inline-metadata-item.ytd-video-meta-block, yt-lockup-view-model yt-content-metadata-view-model span):has-text(/ years? ago$/))
+
+! hide videos with less than 2000 views on Home Page
+www.youtube.com##[page-subtype="home"] ytd-rich-item-renderer:has(:is(.inline-metadata-item.ytd-video-meta-block, yt-lockup-view-model yt-content-metadata-view-model span):has-text(/^(\d{1,3} |No |1(\.\d)?K )views?$/))
+
+! hide mixes on Home Page
+www.youtube.com##[page-subtype="home"] ytd-rich-item-renderer:has(yt-collections-stack:has-text(/[\w\W]{1}/))
+
+! hide ALL live streams on Home Page
+# www.youtube.com##[page-subtype="home"] ytd-rich-item-renderer:has(:is(.badge[aria-label="LIVE"], .badge-shape-wiz--thumbnail-live))
+
+! hide small live streams (under 100 watching) on Home Page
+www.youtube.com##[page-subtype="home"] ytd-rich-item-renderer:has(:is(.inline-metadata-item.ytd-video-meta-block, yt-lockup-view-model yt-content-metadata-view-model span):has-text(/^\d{1,2} watching?$/))
+
+! hide all recorded live streams turned into videos ("Streamed 8 hours ago" etc.) on Home Page
+www.youtube.com##[page-subtype="home"] ytd-rich-item-renderer:has(:is(.inline-metadata-item.ytd-video-meta-block, yt-lockup-view-model yt-content-metadata-view-model span):has-text(/^Streamed/))
+
+! hide garbage videos (less than 80% like ratio) on Home Page
+! (used in conjunction with with https://github.com/elliotwaite/thumbnail-rating-bar-for-youtube)
+www.youtube.com##[page-subtype="home"] ytd-rich-item-renderer:has(.ytrb-percentage:has-text(/^(?:[0-9]|[1-7][0-9])(\.[0-9]{1,2})?%$/))
+
+! hide super short videos (shorter than 1 minute) on Home Page
+# www.youtube.com##[page-subtype="home"] ytd-rich-item-renderer:has(ytd-thumbnail-overlay-time-status-renderer:has-text(/^0:/))
+
+! hide super long videos (1 hour and longer) on Home Page
+# www.youtube.com##[page-subtype="home"] ytd-rich-item-renderer:has(ytd-thumbnail-overlay-time-status-renderer:has-text(/^\d+:\d\d:/))
+
+! hide "Members only" videos on Home Page
+www.youtube.com##[page-subtype="home"] ytd-rich-item-renderer:has(.badge-style-type-members-only)
+
+! hide "Premium" videos on Home Page
+www.youtube.com##[page-subtype="home"] ytd-rich-item-renderer:has(.badge[aria-label="Premium"])
+
+! hide "Pay to watch" videos on Home Page
+www.youtube.com##[page-subtype="home"] ytd-rich-item-renderer:has(.badge[aria-label="Pay to watch"])
+
+! hide "Upcoming" videos on Home Page
+www.youtube.com##[page-subtype="home"] ytd-rich-item-renderer:has(ytd-thumbnail-overlay-time-status-renderer[overlay-style="UPCOMING"])
+
+! hide big yoodle banner on Home Page
+www.youtube.com##[page-subtype="home"] #big-yoodle
+
+! hide "how did you like this video" survey crap on Home Page
+www.youtube.com##[page-subtype="home"] ytd-rich-section-renderer:has(ytd-inline-survey-renderer)
+
+! remove badges like "Fundraiser" from videos on Home Page
+! (using :remove() here because of clashes with thumbnail-rating-bar)
+www.youtube.com##[page-subtype="home"] yt-lockup-view-model yt-content-metadata-view-model > div:nth-child(3):remove()
+
+! set responsive grid layout on Home Page and fix item margins
+www.youtube.com##[page-subtype="home"] ytd-rich-grid-renderer.ytd-two-column-browse-results-renderer:matches-media((max-width: 1500px)):style(--ytd-rich-grid-items-per-row: 3 !important;)
+www.youtube.com##[page-subtype="home"] ytd-rich-grid-renderer.ytd-two-column-browse-results-renderer:matches-media((min-width: 1500px) and (max-width: 2000px)):style(--ytd-rich-grid-items-per-row: 4 !important;)
+www.youtube.com##[page-subtype="home"] ytd-rich-grid-renderer.ytd-two-column-browse-results-renderer:matches-media((min-width: 2000px) and (max-width: 2500px)):style(--ytd-rich-grid-items-per-row: 5 !important;)
+www.youtube.com##[page-subtype="home"] ytd-rich-grid-renderer.ytd-two-column-browse-results-renderer:matches-media((min-width: 2500px)):style(--ytd-rich-grid-items-per-row: 6 !important;)
+www.youtube.com##[page-subtype="home"] ytd-rich-grid-renderer > #contents > ytd-rich-item-renderer[rendered-from-rich-grid]:remove-attr(is-in-first-column)
+
+
+
+! ============================
+! YouTube Subscriptions Page
+! ============================
+
+! hide disruptive sections like "Shorts" on Subscriptions Page
+www.youtube.com##[page-subtype="subscriptions"] ytd-rich-section-renderer:has(#dismissible)
+
+! hide upcoming videos on Subscriptions Page
+www.youtube.com##[page-subtype="subscriptions"] ytd-rich-item-renderer:has(ytd-thumbnail-overlay-time-status-renderer[overlay-style="UPCOMING"])
+
+! hide "Members only" videos on Subscriptions Page
+www.youtube.com##[page-subtype="subscriptions"] ytd-rich-item-renderer:has(.badge-style-type-members-only)
+
+! hide "Premium" videos on Subscriptions Page
+www.youtube.com##[page-subtype="subscriptions"] ytd-rich-item-renderer:has(.badge[aria-label="Premium"])
+
+! hide videos I already watched in full (>=70%) on Subscriptions Page
+www.youtube.com##[page-subtype="subscriptions"] ytd-rich-item-renderer:has(:is(#progress, .ytThumbnailOverlayProgressBarHostWatchedProgressBarSegment):matches-attr(style="/width: ([789][0-9]|100)%/"))
+
+! hide all recorded live streams turned into videos ("Streamed 8 hours ago" etc.) on Subscriptions Page
+www.youtube.com##[page-subtype="subscriptions"] ytd-rich-item-renderer:has(:is(.inline-metadata-item.ytd-video-meta-block, yt-lockup-view-model yt-content-metadata-view-model span):has-text(/^Streamed/))
+
+! remove badges like "Fundraiser" from videos on Subscriptions Page
+! (using :remove() here because of clashes with thumbnail-rating-bar)
+www.youtube.com##[page-subtype="subscriptions"] yt-lockup-view-model yt-content-metadata-view-model > div:nth-child(3):remove()
+
+! set responsive grid layout on Subscriptions Page and fix item margins
+www.youtube.com##[page-subtype="subscriptions"] ytd-rich-grid-renderer.ytd-two-column-browse-results-renderer:matches-media((max-width: 1500px)):style(--ytd-rich-grid-items-per-row: 3 !important;)
+www.youtube.com##[page-subtype="subscriptions"] ytd-rich-grid-renderer.ytd-two-column-browse-results-renderer:matches-media((min-width: 1500px) and (max-width: 2000px)):style(--ytd-rich-grid-items-per-row: 4 !important;)
+www.youtube.com##[page-subtype="subscriptions"] ytd-rich-grid-renderer.ytd-two-column-browse-results-renderer:matches-media((min-width: 2000px) and (max-width: 2500px)):style(--ytd-rich-grid-items-per-row: 5 !important;)
+www.youtube.com##[page-subtype="subscriptions"] ytd-rich-grid-renderer.ytd-two-column-browse-results-renderer:matches-media((min-width: 2500px)):style(--ytd-rich-grid-items-per-row: 6 !important;)
+www.youtube.com##[page-subtype="subscriptions"] ytd-rich-grid-renderer > #contents > ytd-rich-item-renderer[rendered-from-rich-grid]:remove-attr(is-in-first-column)
+
+
+
+! ============================
+! YouTube Search Results
+! ============================
+
+! hide garbage videos (less than 80% like ratio) in Search Results
+! (used in conjunction with with https://github.com/elliotwaite/thumbnail-rating-bar-for-youtube)
+www.youtube.com##ytd-search ytd-video-renderer:has(.ytrb-percentage:has-text(/^(?:[0-9]|[1-7][0-9])(\.[0-9]{1,2})?%$/))
+
+! hide shorts (disguised as regular videos) in Search Results
+www.youtube.com##ytd-search ytd-video-renderer:has(badge-shape[aria-label="Shorts"])
+
+! hide shorts shelf in Search Results
+www.youtube.com##ytd-search ytd-reel-shelf-renderer
+www.youtube.com##ytd-search grid-shelf-view-model:has(.shortsLockupViewModelHost)
+
+! hide fluff ("People also watched", "For you", "Previously watched" etc.) in Search Results
+www.youtube.com##ytd-search ytd-shelf-renderer[thumbnail-style]
+www.youtube.com##ytd-search #contents > ytd-horizontal-card-list-renderer
+
+! hide videos I already watched in full (>=70%) in Search Results
+www.youtube.com##ytd-search ytd-video-renderer:has(:is(#progress, .ytThumbnailOverlayProgressBarHostWatchedProgressBarSegment):matches-attr(style="/width: ([789][0-9]|100)%/"))
+
+! hide movies you can rent or "buy" in Search Results
+www.youtube.com##ytd-search ytd-movie-renderer
+
+! hide right sidebar with ads for streaming services in Search Results
+www.youtube.com##ytd-search ytd-secondary-search-container-renderer:has(ytd-universal-watch-card-renderer)
+
+
+
+! ============================
+! YouTube Channel Page
+! ============================
+
+! Channel Page: Header & Tabs Menu
+
+! hide big top banner on channel header
+www.youtube.com##[page-subtype="channels"] #page-header-banner
+
+! hide links ("example.com and 3 more links") on channel header
+www.youtube.com##[page-subtype="channels"] yt-attribution-view-model
+
+! hide "Join" button on channel header
+www.youtube.com##[page-subtype="channels"] yt-flexible-actions-view-model .yt-flexible-actions-view-model-wiz__action:has(button-view-model:has-text(/^Join/))
+
+! hide "Subscribe +" button on channel header
+www.youtube.com##[page-subtype="channels"] yt-flexible-actions-view-model .yt-flexible-actions-view-model-wiz__action:has(yt-subscribe-plus-button-view-model)
+www.youtube.com##[page-subtype="channels"] yt-flexible-actions-view-model .ytFlexibleActionsViewModelAction:has(>yt-subscribe-plus-button-view-model)
+
+! fix existing "Subscribed" button (restore deleted button text)
+www.youtube.com##[page-subtype="channels"] yt-flexible-actions-view-model yt-subscribe-button-view-model.yt-subscribe-button-view-model-wiz:style(width:auto !important;)
+www.youtube.com##[page-subtype="channels"] yt-flexible-actions-view-model button.yt-spec-button-shape-next--icon-leading-trailing-no-text .yt-spec-button-shape-next__secondary-icon::before:style(display: block; content: "Subscribed"; margin-right: 6px;)
+www.youtube.com##[page-subtype="channels"] yt-flexible-actions-view-model button.yt-spec-button-shape-next--icon-leading-trailing-no-text .yt-spec-button-shape-next__secondary-icon:style(display: flex; align-items: center; width: inherit;)
+
+! hide "Shorts" tab in tab-menu on channel page
+# www.youtube.com##[page-subtype="channels"] yt-tab-group-shape yt-tab-shape[tab-title="Shorts"]
+
+! hide "Live" tab in tab-menu on channel page
+# www.youtube.com##[page-subtype="channels"] yt-tab-group-shape yt-tab-shape[tab-title="Live"]
+
+! hide "Posts" tab in tab-menu on channel page
+# www.youtube.com##[page-subtype="channels"] yt-tab-group-shape yt-tab-shape[tab-title="Posts"]
+
+! hide "Store" tab in tab-menu on channel page
+# www.youtube.com##[page-subtype="channels"] yt-tab-group-shape yt-tab-shape[tab-title="Store"]
+
+! quick CSS fix for that little bar below the tab-menu when some tabs are hidden
+# www.youtube.com##[page-subtype="channels"] yt-tab-group-shape .yt-tab-group-shape-wiz__slider
+# www.youtube.com##[page-subtype="channels"] yt-tab-group-shape .yt-tab-shape-wiz__tab-bar--tab-bar-selected:style(height: 2px !important;background-color: var(--yt-spec-text-primary) !important;)
+
+
+! Channel Page: Page Content
+
+! hide "Shorts" section on channel home page
+www.youtube.com##[page-subtype="channels"] ytd-section-list-renderer > #contents > ytd-item-section-renderer:has(ytd-reel-shelf-renderer) 
+
+! hide "Our Members" section on channel home page
+www.youtube.com##[page-subtype="channels"] ytd-section-list-renderer > #contents > ytd-item-section-renderer:has(ytd-recognition-shelf-renderer)
+
+! hide "For You" section on channel home page
+# www.youtube.com##[page-subtype="channels"] ytd-section-list-renderer > #contents > ytd-item-section-renderer:has(h2:has-text(/For You/)) 
+
+! hide videos I already watched in full (>=70%) on channel home page
+www.youtube.com##[page-subtype="channels"] ytd-grid-video-renderer:has(:is(#progress, .ytThumbnailOverlayProgressBarHostWatchedProgressBarSegment):matches-attr(style="/width: ([789][0-9]|100)%/"))
+
+! hide videos I already watched in full (>=70%) on channel videos page
+www.youtube.com##[page-subtype="channels"] ytd-rich-item-renderer:has(:is(#progress, .ytThumbnailOverlayProgressBarHostWatchedProgressBarSegment):matches-attr(style="/width: ([789][0-9]|100)%/"))
+
+! hide "Premium" videos on channel videos page
+www.youtube.com##[page-subtype="channels"] ytd-rich-item-renderer:has(.badge[aria-label="Premium"])
+
+! hide "Members only" videos on channel videos page
+www.youtube.com##[page-subtype="channels"] ytd-rich-item-renderer:has(.badge-style-type-members-only)
+
+
+
+! ============================
+! YouTube Video Page
+! ============================
+
+! Video Page: Video Player
+
+! reenable the possibility to scroll down the page when the player is in fullscreen
+! Source: https://www.reddit.com/r/uBlockOrigin/comments/1n13if0/youtube_with_player_in_fullscreen_unable_to/
+www.youtube.com##[deprecate-fullerscreen-ui]:remove-attr(deprecate-fullerscreen-ui)
+
+! hide "1080p Premium HD" (which is nothing more than an ad for premium) in video quality settings menu
+www.youtube.com##.ytp-quality-menu .ytp-menuitem:has(.ytp-premium-label)
+
+! hide video overlay on endcards
+www.youtube.com##ytd-player .ytp-ce-element.ytp-ce-element-show.ytp-ce-video
+
+! hide playlist overlay on endcards
+www.youtube.com##ytd-player .ytp-ce-element.ytp-ce-element-show.ytp-ce-playlist
+
+! hide website overlay on endcards
+www.youtube.com##ytd-player .ytp-ce-element.ytp-ce-element-show.ytp-ce-website
+
+! hide channel overlay on endcards
+www.youtube.com##ytd-player .ytp-ce-element.ytp-ce-element-show.ytp-ce-channel
+
+! automatically click on "I understand and wish to proceed" button on "The following content may contain ..." warnings
+! trusted-click-element will ONLY work within "trusted" filters (https://github.com/gorhill/ublock/wiki/Advanced-settings#trustedlistprefixes)!
+www.youtube.com##+js(trusted-click-element, div[id^="player-container"] + #error-screen #info:has(#reason) button[aria-label*="proceed"])
+
+! Video Page: Title and Description
+
+! prevent stats (such as likes and views) from live-updating
+! example: https://www.reddit.com/r/youtube/comments/15c7ndi/youtube_has_added_live_updating_view_counts/
+||youtube.com/youtubei/v1/updated_metadata
+
+! hide "smartimation" animations
+! example: https://www.reddit.com/r/youtube/comments/15ri8fp/the_subscribe_button_now_plays_an_animation_when/
+www.youtube.com##yt-smartimation > :not(.smartimation__content, .ytSmartImationsContent)
+www.youtube.com##yt-animated-action > :not(.animated-action__content-with-background, .ytAnimatedActionContentWithBackground)
+www.youtube.com##:is(.smartimation__content, .ytSmartImationsContent, .animated-action__content-with-background, .ytAnimatedActionContentWithBackground) > :has(> lottie-component)
+
+! disable live reaction overlays
+! example: https://www.reddit.com/r/youtube/comments/13886xr/how_can_i_disable_the_new_live_emoji_reactions/
+www.youtube.com##yt-reaction-control-panel-view-model, yt-reaction-control-panel-overlay-view-model
+
+! hide "Purchase" button below video
+www.youtube.com##ytd-video-owner-renderer > #purchase-button
+
+! hide "Join" button below video
+www.youtube.com##ytd-video-owner-renderer > #sponsor-button
+
+! fix existing "Subscribed" button (restore deleted button text)
+www.youtube.com#$#ytd-subscribe-button-renderer[subscribe-button-invisible][style^="width"],ytd-subscribe-button-renderer[subscribe-button-invisible] yt-subscribe-button-view-model[style^="width"] { width: auto!important; }
+www.youtube.com#$#ytd-subscribe-button-renderer[subscribe-button-invisible] button.yt-spec-button-shape-next--icon-leading-trailing-no-text .yt-spec-button-shape-next__secondary-icon::before {display: block; content: "Subscribed"; margin-right: 6px;}
+www.youtube.com#$#ytd-subscribe-button-renderer[subscribe-button-invisible] button.yt-spec-button-shape-next--icon-leading-trailing-no-text .yt-spec-button-shape-next__secondary-icon {display: flex; align-items: center; width: inherit;}
+
+! hide "Download" button (just an ad for premium) below video
+www.youtube.com###below ytd-download-button-renderer
+www.youtube.com##ytd-menu-popup-renderer ytd-menu-service-item-download-renderer
+
+! hide "Thanks" button below video
+www.youtube.com###below yt-button-view-model:has(button[aria-label="Thanks"])
+www.youtube.com##ytd-menu-popup-renderer ytd-menu-service-item-renderer:has(yt-formatted-string:has-text(/^Thanks/))
+
+! hide "Clip" button below video
+www.youtube.com###below yt-button-view-model:has(button[aria-label="Clip"])
+www.youtube.com##ytd-menu-popup-renderer ytd-menu-service-item-renderer:has(yt-formatted-string:has-text(/^Clip/))
+
+! hide fundraiser badge below video title
+www.youtube.com###below ytd-badge-supported-renderer
+
+! hide that light blue "Clarify box" below video player, above video title
+www.youtube.com###below > #clarify-box
+
+! hide that "... is a public broadcast service" box between video and description
+www.youtube.com###below #middle-row:has(ytd-info-panel-content-renderer)
+
+! hide merch shelf in description
+www.youtube.com###below ytd-structured-description-content-renderer #merch-shelf
+
+! hide "Chapters" in description
+www.youtube.com###below ytd-structured-description-content-renderer #items ytd-horizontal-card-list-renderer[modern-chapters]
+
+! hide "Shorts remixing this video" in description
+www.youtube.com###below ytd-structured-description-content-renderer #items ytd-reel-shelf-renderer
+
+! hide "Music" in description
+www.youtube.com###below ytd-structured-description-content-renderer #items ytd-horizontal-card-list-renderer[has-video-attribute-view-models]
+
+! hide "Transcription" in description
+www.youtube.com###below ytd-structured-description-content-renderer #items ytd-video-description-transcript-section-renderer
+
+! hide that creator infobox with links at the end of the description box
+www.youtube.com###below ytd-structured-description-content-renderer #items ytd-video-description-infocards-section-renderer
+
+! hide "Live Chat Replay" box which sometimes appears next to the description
+www.youtube.com###below #teaser-carousel
+
+! hide merch shelf below description
+www.youtube.com###below ytd-merch-shelf-renderer
+
+! hide shitty AI summary nobody ever asked for below description
+www.youtube.com###below [has-video-summary]
+
+! hide all "Age-restricted video" notices below description, above comment section (https://support.google.com/youtube/answer/2802167)
+www.youtube.com##ytd-metadata-row-container-renderer > #always-shown > ytd-metadata-row-renderer:has(a[href*="community_guidelines"],a[href*="age_restrictions"])
+
+! hide all "Rating" notices below video description, above comment section (https://support.google.com/youtube/answer/146397)
+www.youtube.com##ytd-metadata-row-container-renderer > #always-shown > ytd-metadata-row-renderer:has(a[href*="answer/146397"])
+
+! hide that fucking "Experiencing interruptions?" toast message because of AdBlock
+www.youtube.com##tp-yt-paper-toast#toast:has(yt-button-renderer#action-button a[href*=blocker])
+
+
+! Video Page: Sidebar / Related videos
+
+! hide donation box for fundraiser videos
+www.youtube.com###secondary #donation-shelf
+
+! hide Shorts in video sidebar
+www.youtube.com###columns #secondary ytd-compact-video-renderer:has(a[href^="/shorts/"])
+
+! hide that weird channel card which sometimes appears somewhere in video sidebar
+www.youtube.com###columns #secondary ytd-channel-renderer
+
+! hide garbage videos (less than 80% like ratio) in video sidebar
+! (used in conjunction with with https://github.com/elliotwaite/thumbnail-rating-bar-for-youtube)
+www.youtube.com##ytd-watch-flexy yt-lockup-view-model:has(.ytrb-percentage:has-text(/^(?:[0-9]|[1-7][0-9])(\.[0-9]{1,2})?%$/))
+
+! hide "Members first" videos in video sidebar
+www.youtube.com##ytd-watch-flexy yt-lockup-view-model:has(.badge-shape-wiz--commerce)
+
+! hide old videos (1 year and older) in video sidebar
+www.youtube.com##ytd-watch-flexy yt-lockup-view-model:has(yt-content-metadata-view-model span:has-text(/^\d+ years? ago$/))
+
+! hide super short videos (shorter than 1 minute) in video sidebar
+www.youtube.com##ytd-watch-flexy yt-lockup-view-model:has(yt-thumbnail-overlay-badge-view-model:has-text(/^0:/))
+
+! hide super long videos (1 hour and longer) in video sidebar
+www.youtube.com##ytd-watch-flexy yt-lockup-view-model:has(yt-thumbnail-overlay-badge-view-model:has-text(/^\d+:\d\d:/))
+
+! hide live streams in video sidebar
+www.youtube.com##ytd-watch-flexy yt-lockup-view-model:has(.badge-shape-wiz--thumbnail-live)
+
+! hide videos I already watched in full (>=70%) in video sidebar
+www.youtube.com##ytd-watch-flexy yt-lockup-view-model:has(.ytThumbnailOverlayProgressBarHostWatchedProgressBarSegment:matches-attr(style="/width: ([789][0-9]|100)%/"))
+
+! hide playlists in video sidebar
+www.youtube.com##ytd-watch-flexy yt-lockup-view-model:has(yt-content-metadata-view-model:has-text(/^Playlist/))
+
+! hide videos with less than 2000 views in video sidebar
+www.youtube.com##ytd-watch-flexy yt-lockup-view-model:has(yt-content-metadata-view-model span:has-text(/^(\d{1,3} |No |1(\.\d)?K )views?$/))
+
+! remove badges like "Fundraiser" from videos in video sidebar
+! (using :remove() here because of clashes with thumbnail-rating-bar)
+www.youtube.com##ytd-watch-flexy yt-lockup-view-model yt-content-metadata-view-model > div:nth-child(3):remove()

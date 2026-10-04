@@ -1,0 +1,12 @@
+! Title: YouTube annoyances
+! Description: Personal, self-curated filters for YouTube annoyances.
+! Expires: 6 hours
+! Homepage: https://github.com/XxUnkn0wnxX/adblock-filters
+! License: GPL-3.0
+!
+! Included upstream list: yt-neuter SponsorBlock
+! This local copy is maintained by the sync-upstream workflow.
+!#include upstream/sponsorblock.txt
+
+! Custom filters
+! Add custom YouTube rules below.
