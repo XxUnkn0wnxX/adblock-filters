@@ -1,4 +1,4 @@
-name: Sync upstream filters
+name: Adblock-Synchroniser
 
 on:
   schedule:
@@ -6,10 +6,9 @@ on:
     - cron: '17 */6 * * *'
   workflow_dispatch:
   push:
+    # Check upstream sources on every push to the repository's only branch.
     branches:
       - main
-    paths:
-      - .github/workflows/sync-upstream.yml
 
 permissions:
   contents: write
@@ -134,6 +133,7 @@ jobs:
             exit 0
           fi
 
+          # Use the built-in Actions bot; its token prevents recursive push runs.
           git -c user.name='github-actions[bot]' \
             -c user.email='41898282+github-actions[bot]@users.noreply.github.com' \
             commit -m 'Update upstream filters'

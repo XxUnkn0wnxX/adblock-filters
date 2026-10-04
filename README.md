@@ -29,10 +29,13 @@ are also mirrored for reference. They are not included in the custom list.
 
 ## Updating upstream filters
 
-The [Sync upstream filters workflow](.github/workflows/sync-upstream.yml) checks
-for updates every six hours at minute 17 UTC and can also be run manually from
-GitHub Actions. It compares each downloaded file with the local copy and commits
-only changed files to `main`.
+The [Adblock-Synchroniser workflow](.github/workflows/sync-upstream.yml) checks
+for updates on every push to `main` and every six hours at minute 17 UTC. It can
+also be run manually from GitHub Actions. It compares each downloaded file with
+the local copy and commits only changed files to `main`.
+
+Automated commits use GitHub's built-in `github-actions[bot]` identity. Pushes
+made with its workflow token do not trigger another run.
 
 To mirror another list, add a line to the workflow's `UPSTREAM_FILTERS` table:
 
