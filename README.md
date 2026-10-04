@@ -25,7 +25,10 @@ Each domain has its own folder under `filters/`.
 
 </details>
 
-## 🔄 Upstream synchronisation
+<details>
+<summary><strong>🔄 Upstream synchronisation and adding sources</strong></summary>
+
+### Upstream synchronisation
 
 The [**Adblock-Synchroniser** workflow](.github/workflows/sync-upstream.yml)
 maintains local copies of the configured upstream lists.
@@ -45,7 +48,7 @@ maintains local copies of the configured upstream lists.
 Automated commits use GitHub's built-in `github-actions[bot]` identity. Pushes
 made with its workflow token do not trigger another run.
 
-## ➕ Adding upstream sources
+### ➕ Adding upstream sources
 
 1. **Add a source mapping** to the workflow's `UPSTREAM_FILTERS` table:
 
@@ -70,6 +73,8 @@ https://gist.githubusercontent.com/<user>/<gist-id>/raw/<filename>
 **uBlock Origin includes:** Paths must be relative and stay within the list's
 directory or a subdirectory. See the
 [uBO include documentation](https://github.com/gorhill/uBlock/wiki/Static-filter-syntax#include-file-name).
+
+</details>
 
 ## 📄 License
 
