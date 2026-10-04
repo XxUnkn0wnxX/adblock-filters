@@ -18,14 +18,6 @@
 ! ============================
 www.youtube.com##ytd-popup-container > tp-yt-paper-dialog:has(upsell-view-model)
 
-! ============================
-! YouTube Playables - Home feed
-! Hide Home feed sections linking to Playables.
-! ============================
+! Hide YouTube Playables
 www.youtube.com##ytd-rich-section-renderer:has(a[href^="/playables/"])
-
-! ============================
-! YouTube Playables - sidebar
-! Hide sidebar entries linking to Playables.
-! ============================
 www.youtube.com##ytd-guide-entry-renderer:has(a[href^="/playables"])
