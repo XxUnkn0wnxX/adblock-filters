@@ -14,10 +14,9 @@ Each domain has its own folder under `filters/`.
 
 - **Filter list:** [YouTube annoyances](filters/youtube/yt-annoyances.txt).
 - **Subscription:** [🛡️ Subscribe to YouTube annoyances](https://subscribe.adblockplus.org/?location=https%3A%2F%2Fraw.githubusercontent.com%2FXxUnkn0wnxX%2Fadblock-filters%2Fmain%2Ffilters%2Fyoutube%2Fyt-annoyances.txt&title=YouTube%20annoyances).
-  <!--
-  Raw URL fallback for manual importing:
-  https://raw.githubusercontent.com/XxUnkn0wnxX/adblock-filters/main/filters/youtube/yt-annoyances.txt
-  -->
+
+  > **Raw URL fallback:** [Raw YouTube annoyances list](https://raw.githubusercontent.com/XxUnkn0wnxX/adblock-filters/main/filters/youtube/yt-annoyances.txt).
+
 - **Reference only:** The [SponsorBlock mirror](filters/youtube/upstream/sponsorblock.txt),
   pulled from [yt-neuter's SponsorBlock filters](https://github.com/mchangrh/yt-neuter/blob/main/filters/sponsorblock.txt).
 - **Reference only:** The latest [tadwohlrapp YouTube filters](filters/youtube/upstream/ublock-filter-youtube.txt).
