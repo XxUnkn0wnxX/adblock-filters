@@ -13,6 +13,7 @@ Each domain has its own folder under `filters/`.
 ### Custom list
 
 - **Filter list:** [YouTube annoyances](filters/youtube/yt-annoyances.txt).
+- **Subscription URL:** [Raw YouTube annoyances list](https://raw.githubusercontent.com/XxUnkn0wnxX/adblock-filters/main/filters/youtube/yt-annoyances.txt).
 - **Included:** The [SponsorBlock mirror](filters/youtube/upstream/sponsorblock.txt),
   pulled from [yt-neuter's SponsorBlock filters](https://github.com/mchangrh/yt-neuter/blob/main/filters/sponsorblock.txt).
 - **Reference only:** The latest [tadwohlrapp YouTube filters](filters/youtube/upstream/ublock-filter-youtube.txt).
@@ -45,6 +46,10 @@ maintains local copies of the configured upstream lists.
 - **Original contents:** Preserves upstream files without rewriting their rules or comments.
 - **Failed downloads:** Keeps the previous copies when a source cannot be downloaded.
 
+The custom list's **version, update dates, and checksum** describe that file and
+are maintained when it is edited. The sync workflow updates upstream mirrors
+only and does not modify the custom list.
+
 Automated commits use GitHub's built-in `github-actions[bot]` identity. Pushes
 made with its workflow token do not trigger another run.
 
@@ -71,7 +76,10 @@ https://gist.githubusercontent.com/<user>/<gist-id>/raw/<filename>
 ```
 
 **uBlock Origin includes:** Paths must be relative and stay within the list's
-directory or a subdirectory. See the
+directory or a subdirectory. In `filters/youtube/yt-annoyances.txt`, the directive
+`!#include upstream/sponsorblock.txt` resolves to
+`filters/youtube/upstream/sponsorblock.txt` in this repository. Subscribe using
+the raw list URL above. See the
 [uBO include documentation](https://github.com/gorhill/uBlock/wiki/Static-filter-syntax#include-file-name).
 
 </details>
