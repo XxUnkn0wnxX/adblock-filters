@@ -44,15 +44,16 @@ python3 helpers/update_checksums.py --force
 python3 helpers/update_checksums.py --help
 ```
 
-The helper skips `upstream/` directories and never adds a missing checksum
+The helper excludes `upstream/` directories and never adds a missing checksum
 header, even with `--force`. A current checksum leaves dates and file contents
 unchanged during a normal run. Upstream-only syncs and checksum-only
 verification do not need version or date bumps.
 
 Output groups eligible files by folder within `filters/`, with each filename,
 status, and metadata beneath it. Updates and dry runs show **old → new**
-checksums and dates; current files show their existing values. Files without a
-checksum header are counted as skipped in the totals.
+checksums and dates. **`skipped` means a custom list is already current**, so its
+existing values are displayed. Only lists with checksum headers are reported
+and counted; upstream folders and files without checksum headers are excluded.
 
 See the [checksum helper guide](docs/checksum-helper.md) for setup, usage, and
 testing.
@@ -69,7 +70,8 @@ maintains local copies of the configured upstream lists.
 
 **When it runs**
 
-- **On push:** Every push to `main`.
+- **On push:** Changes to `.txt` files under `filters/` on `main`, excluding
+  `upstream/` folders.
 - **Scheduled:** Every six hours, at minute 17 UTC.
 - **Manual:** Use **Run workflow** in GitHub Actions.
 

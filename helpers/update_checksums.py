@@ -161,10 +161,10 @@ def plan_status(plan: PlannedFile, dry_run: bool, force: bool) -> str:
     if dry_run:
         if force:
             return "would force"
-        return "would update" if plan.needs_update else "current"
+        return "would update" if plan.needs_update else "skipped"
     if force:
         return "forced"
-    return "updated" if plan.needs_update else "current"
+    return "updated" if plan.needs_update else "skipped"
 
 
 def plan_details(plan: PlannedFile, status: str) -> List[str]:
@@ -321,12 +321,9 @@ def main(argv: Optional[List[str]] = None) -> int:
         files = regular_filter_files(filters_root)
         timestamp = datetime.now(timezone.utc).isoformat(timespec="seconds")
         plans: List[PlannedFile] = []
-        skipped_without_checksum = 0
         for file_path in files:
             plan = preflight_file(file_path, repo_root, timestamp, args.force)
-            if plan is None:
-                skipped_without_checksum += 1
-            else:
+            if plan is not None:
                 plans.append(plan)
     except (OSError, ChecksumError) as error:
         print(f"update_checksums: {error}", file=sys.stderr)
@@ -337,7 +334,7 @@ def main(argv: Optional[List[str]] = None) -> int:
         "forced": 0,
         "would update": 0,
         "would force": 0,
-        "current": 0,
+        "skipped": 0,
     }
     statuses: dict[str, str] = {}
     for plan in plans:
@@ -357,11 +354,10 @@ def main(argv: Optional[List[str]] = None) -> int:
     print_plan_tree(plans, statuses)
     print(
         "Totals: "
-        f"{len(files)} files scanned, {len(plans)} with checksum headers, "
-        f"{skipped_without_checksum} skipped without headers, "
+        f"{len(plans)} {'filter' if len(plans) == 1 else 'filters'} checked, "
         f"{counts['updated']} updated, {counts['forced']} forced, "
         f"{counts['would update']} would update, {counts['would force']} would force, "
-        f"{counts['current']} current."
+        f"{counts['skipped']} skipped (no update needed)."
     )
     return 0
 

@@ -6,9 +6,13 @@ on:
     - cron: '17 */6 * * *'
   workflow_dispatch:
   push:
-    # Check upstream sources on every push to the repository's only branch.
+    # Check upstream sources when a custom filter changes on main.
     branches:
       - main
+    paths:
+      - 'filters/**/*.txt'
+      # Keep mirror-only changes outside the push trigger.
+      - '!filters/**/upstream/**'
 
 permissions:
   contents: write

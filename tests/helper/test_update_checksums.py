@@ -139,9 +139,9 @@ def test_recurses_domains_and_filenames_with_spaces_from_another_cwd(tmp_path: P
 
     result = run_helper(repo_root, helper, cwd=tmp_path)
     assert result.returncode == 0, result.stderr
-    assert "root list.txt [current]\n  Checksum: " in result.stdout
+    assert "root list.txt [skipped]\n  Checksum: " in result.stdout
     assert "example\n  nested\n    no-extension [updated]" in result.stdout
-    assert "youtube\n  another.txt [current]" in result.stdout
+    assert "youtube\n  another.txt [skipped]" in result.stdout
     assert "  list with spaces.txt [updated]" in result.stdout
     assert "filters/" not in result.stdout
     assert "    Checksum: " in result.stdout
@@ -170,7 +170,7 @@ def test_recurses_domains_and_filenames_with_spaces_from_another_cwd(tmp_path: P
     stable_stats = {file_path: file_path.stat() for file_path in (first, second, root_file, sibling)}
     second_run = run_helper(repo_root, helper)
     assert second_run.returncode == 0, second_run.stderr
-    assert "[current]" in second_run.stdout
+    assert "[skipped]" in second_run.stdout
     for file_path in stable_bytes:
         assert file_path.read_bytes() == stable_bytes[file_path]
         assert file_path.stat().st_mtime_ns == stable_stats[file_path].st_mtime_ns
@@ -194,7 +194,7 @@ def test_current_checksum_is_noop_and_preserves_mtime(tmp_path: Path) -> None:
     result = run_helper(repo_root, helper)
     after = file_path.stat()
     assert result.returncode == 0, result.stderr
-    assert "current.txt [current]" in result.stdout
+    assert "current.txt [skipped]" in result.stdout
     assert f"  Checksum: {OFFICIAL_CHECKSUM.search(contents[:200]).group(1)}" in result.stdout
     assert "  TimeUpdated: 2020-01-01T00:00:00+00:00" in result.stdout
     assert "  Last modified: 2020-01-01T00:00:00+00:00" in result.stdout
@@ -314,7 +314,12 @@ def test_force_rewrites_existing_only_and_skips_nested_upstream_and_symlinks(tmp
     result = run_helper(repo_root, helper, "--force")
     assert result.returncode == 0, result.stderr
     assert "custom file [forced]" in result.stdout
-    assert "skipped without headers" in result.stdout
+    assert "no-header" not in result.stdout
+    assert "UPSTREAM" not in result.stdout
+    assert "UpStReAm" not in result.stdout
+    assert "linked-list" not in result.stdout
+    assert "linked-directory" not in result.stdout
+    assert "Totals: 1 filter checked, 0 updated, 1 forced, 0 would update, 0 would force, 0 skipped (no update needed)." in result.stdout
     assert forced_file.stat().st_mtime_ns > forced_before.st_mtime_ns
     forced_text = forced_file.read_text(encoding="utf-8")
     assert "! Version: 3.2.1\n" in forced_text
@@ -339,6 +344,11 @@ def test_dry_run_and_dry_run_force_do_not_write(tmp_path: Path) -> None:
     directory.mkdir(parents=True)
     current_file = directory / "current.txt"
     stale_file = directory / "stale.txt"
+    no_header_files = [directory / f"ignored-{index}.txt" for index in range(4)]
+    upstream_files = [
+        directory / "upstream" / "source.txt",
+        directory / "nested" / "UPSTREAM" / "source.txt",
+    ]
     current = checked_list(
         "! Title: Dry run\n! Version: 1.0.0\n"
         "! TimeUpdated: 2020-01-01T00:00:00+00:00\n"
@@ -351,6 +361,11 @@ def test_dry_run_and_dry_run_force_do_not_write(tmp_path: Path) -> None:
     )
     current_file.write_text(current, encoding="utf-8")
     stale_file.write_text(stale, encoding="utf-8")
+    for index, file_path in enumerate(no_header_files):
+        file_path.write_text(f"! Title: Ignore {index}\nexample.org##.ad\n", encoding="utf-8")
+    for file_path in upstream_files:
+        file_path.parent.mkdir(parents=True, exist_ok=True)
+        file_path.write_text(current, encoding="utf-8")
     known_time = 1_577_934_245_000_000_000
     for file_path in (current_file, stale_file):
         os.utime(file_path, ns=(known_time, known_time))
@@ -360,20 +375,38 @@ def test_dry_run_and_dry_run_force_do_not_write(tmp_path: Path) -> None:
     ordinary_dry_run = run_helper(repo_root, helper, "--dry-run")
     assert ordinary_dry_run.returncode == 0, ordinary_dry_run.stderr
     assert "stale.txt [would update]" in ordinary_dry_run.stdout
-    assert "current.txt [current]" in ordinary_dry_run.stdout
+    assert "current.txt [skipped]" in ordinary_dry_run.stdout
+    assert "Totals: 2 filters checked, 0 updated, 0 forced, 1 would update, 0 would force, 1 skipped (no update needed)." in ordinary_dry_run.stdout
+    assert all(file_path.name not in ordinary_dry_run.stdout for file_path in no_header_files + upstream_files)
+
+    for file_path in before_bytes:
+        assert file_path.read_bytes() == before_bytes[file_path]
+        assert file_path.stat().st_mtime_ns == before_stats[file_path].st_mtime_ns
+        assert file_path.stat().st_ino == before_stats[file_path].st_ino
+
+    normal_update = run_helper(repo_root, helper)
+    assert normal_update.returncode == 0, normal_update.stderr
+    assert "stale.txt [updated]" in normal_update.stdout
+    assert "current.txt [skipped]" in normal_update.stdout
+    assert "Totals: 2 filters checked, 1 updated, 0 forced, 0 would update, 0 would force, 1 skipped (no update needed)." in normal_update.stdout
+    before_force_bytes = {current_file: current_file.read_bytes(), stale_file: stale_file.read_bytes()}
+    before_force_stats = {current_file: current_file.stat(), stale_file: stale_file.stat()}
 
     forced_dry_run = run_helper(repo_root, helper, "--dry-run", "--force")
     assert forced_dry_run.returncode == 0, forced_dry_run.stderr
     assert "current.txt [would force]" in forced_dry_run.stdout
     assert "stale.txt [would force]" in forced_dry_run.stdout
-    assert "  Checksum: stale -> " in forced_dry_run.stdout
+    for file_content in before_force_bytes.values():
+        old_checksum = OFFICIAL_CHECKSUM.search(file_content.decode("utf-8")[:200]).group(1)
+        assert f"Checksum: {old_checksum} -> " in forced_dry_run.stdout
     assert "  TimeUpdated: 2020-01-01T00:00:00+00:00 -> " in forced_dry_run.stdout
     assert "  Last modified: 2020-01-01T00:00:00+00:00 -> " in forced_dry_run.stdout
-    for file_path in before_bytes:
+    assert "Totals: 2 filters checked, 0 updated, 0 forced, 0 would update, 2 would force, 0 skipped (no update needed)." in forced_dry_run.stdout
+    for file_path in before_force_bytes:
         after = file_path.stat()
-        assert file_path.read_bytes() == before_bytes[file_path]
-        assert after.st_mtime_ns == before_stats[file_path].st_mtime_ns
-        assert after.st_ino == before_stats[file_path].st_ino
+        assert file_path.read_bytes() == before_force_bytes[file_path]
+        assert after.st_mtime_ns == before_force_stats[file_path].st_mtime_ns
+        assert after.st_ino == before_force_stats[file_path].st_ino
 
 
 def test_dry_run_force_previews_exact_values_for_a_current_file(tmp_path: Path, monkeypatch, capsys) -> None:

@@ -72,28 +72,30 @@ youtube
     Last modified: 2026-10-05T00:04:17+00:00 -> 2026-10-05T00:39:49+00:00
 ```
 
-- **`current`:** The file was checked and left unchanged; its existing metadata
-  is displayed.
+- **`skipped`:** The custom list was checked and needs no update; its existing
+  metadata is displayed and the file is left unchanged.
 - **`updated` / `forced`:** The displayed new values were written to the file.
 - **`would update` / `would force`:** Dry-run previews the same metadata changes
   without writing them.
 
 Missing and empty fields are displayed as `(missing)` and `(empty)`.
-The final totals count scanned files, eligible lists, skipped files without
-checksum headers, and each result status. Upstream directories are excluded
-from scanning.
+The final totals count only eligible custom lists and their result statuses.
+`skipped (no update needed)` counts lists whose checksums are already current.
+Upstream directories and files without checksum headers do not appear in the
+output or contribute to any total.
 
 ## 🗂️ Which files are checked?
 
 The helper recursively scans regular files under `filters/`, regardless of
 extension, and selects files that already contain a `! Checksum:` comment.
-Every directory named `upstream` is skipped, without regard to letter case.
+Every directory named `upstream` is excluded, without regard to letter case.
 Symbolic links are not followed.
 
 For example, `filters/youtube/yt-annoyances.txt` is eligible when it has a
-checksum header. The mirror at `filters/youtube/upstream/sponsorblock.txt` is
-skipped. The reference-only gist mirror is skipped for the same reason; no
-placeholder files are needed for other domains or mirrors.
+checksum header. Both files under `filters/youtube/upstream/` are outside the
+helper's scope, including all output and counts. Files without checksum headers
+are also outside its reporting totals; no placeholder files are needed for
+other domains or mirrors.
 
 By default, the helper compares the stored checksum with the checksum
 calculated from the file as it currently stands, including its current dates.
