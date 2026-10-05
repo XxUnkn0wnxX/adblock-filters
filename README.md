@@ -54,13 +54,8 @@ status, and metadata beneath it. Updates and dry runs show **old → new**
 checksums and dates; current files show their existing values. Files without a
 checksum header are counted as skipped in the totals.
 
-Run the helper tests with:
-
-```sh
-.venv/bin/python -m pytest tests/helper/test_update_checksums.py
-```
-
-See the [checksum helper guide](docs/checksum-helper.md) for setup and usage.
+See the [checksum helper guide](docs/checksum-helper.md) for setup, usage, and
+testing.
 
 </details>
 
