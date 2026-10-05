@@ -32,9 +32,9 @@ Each domain has its own folder under `filters/`.
 <details>
 <summary><strong>🧰 Maintaining custom lists</strong></summary>
 
-When custom-list content changes, increment its patch version unless the user
-directs otherwise. Keep `Expires: 6 hours (update frequency)`, then run the
-helper after all content edits. On a checksum mismatch, it updates
+When I change a custom list, I increment its patch version and keep
+`Expires: 6 hours (update frequency)`. After editing, I run the helper. On a
+checksum mismatch, it updates
 `TimeUpdated` and `Last modified` to the same current UTC timestamp and then
 recalculates the checksum. `--force` refreshes dates and checksum even when the
 checksum is already current; the helper never changes `Version`.
@@ -99,14 +99,14 @@ made with its workflow token do not trigger another run.
    filters/<domain>/upstream/<filename>.txt https://raw.githubusercontent.com/<owner>/<repo>/<branch>/<path>.txt
    ```
 
-2. **Only if the user asks to include a mirror**, add a relative include directive
-   to the custom list:
+2. **To use a mirror's rules**, add a relative include directive to the custom
+   list:
 
    ```text
    !#include upstream/<filename>.txt
    ```
 
-   Otherwise, keep the mirror reference-only by leaving out the include.
+   For a **reference-only mirror**, leave out the include.
 
 **Following the latest gist revision:** Use an unpinned raw URL:
 
@@ -114,9 +114,9 @@ made with its workflow token do not trigger another run.
 https://gist.githubusercontent.com/<user>/<gist-id>/raw/<filename>
 ```
 
-**Future uBlock Origin includes (only if a mirror is added):** Include paths
+**uBlock Origin includes:** Include paths
 must be relative and stay within the list's directory or a subdirectory. For
-example, if the SponsorBlock mirror is later added to
+example, if I later include the SponsorBlock mirror in
 `filters/youtube/yt-annoyances.txt`, `!#include upstream/sponsorblock.txt`
 resolves to `filters/youtube/upstream/sponsorblock.txt` in this repository.
 Use the Subscribe link above to add the custom list. See the

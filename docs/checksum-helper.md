@@ -122,8 +122,7 @@ the helper. A typical sequence is:
 
 1. Edit the rules or include directives in the custom list.
 2. Increment `Version` by one patch level when needed, such as `1.0.0` to
-   `1.0.1`, unless the user directs otherwise. The helper never changes
-   `Version`.
+   `1.0.1`. The helper never changes `Version`.
 3. Run the helper. When an update is needed, it refreshes `TimeUpdated` and
    `Last modified` to the same current UTC ISO 8601 timestamp with `+00:00`,
    then calculates and writes the final checksum.
@@ -137,10 +136,8 @@ the helper. A typical sequence is:
 
 Upstream-only updates and checksum verification without a content change do not
 require a version bump. A forced rewrite refreshes dates even without a content
-change. `Expires: 6 hours (update frequency)` is the client update-check
-interval; it does not set a release schedule and should stay unchanged unless
-explicitly requested. User instructions may override the usual version/date
-handling.
+change. Keep `Expires: 6 hours (update frequency)` as the client update-check
+interval; it does not set a release schedule.
 
 ## 🧮 How the checksum is calculated
 
