@@ -93,34 +93,48 @@ made with its workflow token do not trigger another run.
 
 ### ➕ Adding upstream sources
 
+Optional reference for anyone extending this repo or a fork. The workflow can
+keep local copies of other lists for curation, or maintain mirrors you choose
+to include in your own custom lists.
+
 1. **Add a source mapping** to the workflow's `UPSTREAM_FILTERS` table:
 
    ```text
    filters/<domain>/upstream/<filename>.txt https://raw.githubusercontent.com/<owner>/<repo>/<branch>/<path>.txt
    ```
 
-2. **To use a mirror's rules**, add a relative include directive to the custom
-   list:
+   To follow the latest revision of a gist, use an unpinned raw URL:
+
+   ```text
+   https://gist.githubusercontent.com/<owner>/<gist-id>/raw/<filename>
+   ```
+
+2. **Fetch the mirror:** Commit the mapping to `main`. In a fork, enable the
+   workflow in **Actions** if needed, then use
+   **Actions → Adblock-Synchroniser → Run workflow** to download it immediately.
+   Later checks follow the push and scheduled triggers described above.
+
+3. **Choose how to use it:** Keep the mirror **reference only** for curation,
+   or add a relative include to your custom list to apply its rules:
 
    ```text
    !#include upstream/<filename>.txt
    ```
 
-   For a **reference-only mirror**, leave out the include.
+   Leave out the include for a reference-only mirror. Keep custom edits in
+   your own list so the workflow can continue refreshing the upstream copy.
+   After editing a custom list, update its `Version` manually and run the
+   [checksum helper](docs/checksum-helper.md).
 
-**Following the latest gist revision:** Use an unpinned raw URL:
-
-```text
-https://gist.githubusercontent.com/<user>/<gist-id>/raw/<filename>
-```
-
-**uBlock Origin includes:** Include paths
-must be relative and stay within the list's directory or a subdirectory. For
-example, if I later include the SponsorBlock mirror in
-`filters/youtube/yt-annoyances.txt`, `!#include upstream/sponsorblock.txt`
-resolves to `filters/youtube/upstream/sponsorblock.txt` in this repository.
-Use the Subscribe link above to add the custom list. See the
+**Relative includes:** Paths resolve from the custom list's directory and must
+stay within it or a subdirectory. For example, in `filters/example/custom.txt`,
+`!#include upstream/source.txt` points to
+`filters/example/upstream/source.txt`. See the
 [uBO include documentation](https://github.com/gorhill/uBlock/wiki/Static-filter-syntax#include-file-name).
+
+**Using a fork:** Update the repository URLs in your custom-list metadata.
+Set the Subscribe link's `location` parameter and the raw fallback URL to your
+fork's raw custom-list URL.
 
 </details>
 
