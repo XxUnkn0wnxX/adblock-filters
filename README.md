@@ -13,7 +13,11 @@ Each domain has its own folder under `filters/`.
 ### Custom list
 
 - **Filter list:** [YouTube annoyances](filters/youtube/yt-annoyances.txt).
-- **Subscription URL:** [Raw YouTube annoyances list](https://raw.githubusercontent.com/XxUnkn0wnxX/adblock-filters/main/filters/youtube/yt-annoyances.txt).
+- **Subscription:** [🛡️ Subscribe to YouTube annoyances](https://subscribe.adblockplus.org/?location=https%3A%2F%2Fraw.githubusercontent.com%2FXxUnkn0wnxX%2Fadblock-filters%2Fmain%2Ffilters%2Fyoutube%2Fyt-annoyances.txt&title=YouTube%20annoyances).
+  <!--
+  Raw URL fallback for manual importing:
+  https://raw.githubusercontent.com/XxUnkn0wnxX/adblock-filters/main/filters/youtube/yt-annoyances.txt
+  -->
 - **Reference only:** The [SponsorBlock mirror](filters/youtube/upstream/sponsorblock.txt),
   pulled from [yt-neuter's SponsorBlock filters](https://github.com/mchangrh/yt-neuter/blob/main/filters/sponsorblock.txt).
 - **Reference only:** The latest [tadwohlrapp YouTube filters](filters/youtube/upstream/ublock-filter-youtube.txt).
@@ -116,7 +120,7 @@ must be relative and stay within the list's directory or a subdirectory. For
 example, if the SponsorBlock mirror is later added to
 `filters/youtube/yt-annoyances.txt`, `!#include upstream/sponsorblock.txt`
 resolves to `filters/youtube/upstream/sponsorblock.txt` in this repository.
-Subscribe using the raw list URL above. See the
+Use the Subscribe link above to add the custom list. See the
 [uBO include documentation](https://github.com/gorhill/uBlock/wiki/Static-filter-syntax#include-file-name).
 
 </details>
